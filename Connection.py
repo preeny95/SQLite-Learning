@@ -19,10 +19,11 @@ sqlitedb = 'viber_messages2'
 
 #Connect to the Sqlite3 database
 connect = sqlite3.connect(sqlitedb)
-df = pd.read_sql_query("""SELECT messages._id, messages.date, messages.body, messages.conversation_id, participants_info.number, participants_info.display_name, participants_info._id
-        FROM messages
-        INNER JOIN participants_info
-        ON messages.participant_id = participants_info._id;""", connect)
+df = pd.read_sql_query("""SELECT m._id,m.body, participants_info.number, participants_info.display_name, participants_info._id
+        FROM messages m, participants
+        CROSS JOIN participants_info
+        ON participants.participant_info_id = participants_info._id
+        WHERE m.conversation_id IS NOT NULL;""", connect)
 df.to_html(open('messages.html', 'w'))
 base_filename = 'test.txt'
 with open(os.path.join(base_filename),'w') as outfile:

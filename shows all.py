@@ -7,16 +7,14 @@ cur = conn.cursor()
 #Adapted from Stackoverflow.com by Parfait
 cur = cur.execute("SELECT DISTINCT m.conversation_id" + \
                     " FROM messages m " + \
-                    " INNER JOIN participants p" + \
+                    " CROSS JOIN participants p, participants_info pp" + \
                     "         ON m.participant_id = p.participant_info_id" + \
-                    "INNER JOIN participants_info pp"
-                    "         ON pp._id = p.participant_info_id" + \
                     " WHERE m.conversation_id IS NOT NULL")
 
 query = "SELECT m._id, m.date, m.body, m.conversation_id," + \
-          "     p._id, p.conversation_id, p.active" + \
+          "     p._id" + \
           " FROM messages m" + \
-          " INNER JOIN participants p" + \
+          " CROSS JOIN participants p, participants_info pp" + \
           "         ON m.participant_id = p._id" + \
           " WHERE m.conversation_id = ?"
 

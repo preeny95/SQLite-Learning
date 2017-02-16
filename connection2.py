@@ -1,5 +1,7 @@
 import sqlite3
 import pandas as pd
+import os
+
 sqlitedb = 'viber_messages2'
 #Messages table containing all of the messages
 #_id = Message ID
@@ -17,17 +19,13 @@ sqlitedb = 'viber_messages2'
 
 #Connect to the Sqlite3 database
 connect = sqlite3.connect(sqlitedb)
-with connect:
-    cur = connect.cursor()
-    cur.execute("""SELECT messages._id,messages.body, participants_info.number, participants_info.display_name, participants_info._id
-            FROM messages
-            INNER JOIN participants_info
-            ON messages.participant_id = participants_info._id
-            INNER JOIN participants
-            ON participants.participant_info_id = participants_info._id;""")
-while True:
-
-    row = cur.fetchone()
-    if row == None:
-        break
-    print (row)
+df = pd.read_sql_query("""SELECT m._id,m.body, participants_info.number, participants_info.display_name, participants_info._id
+        FROM messages m, participants_info
+        JOIN participants
+        ON participants_info._id = participants.participant_info_id
+        WHERE m.conversation_id IS NOT NULL;""", connect)
+df.to_html(open('messages.html', 'w'))
+base_filename = 'test.txt'
+with open(os.path.join(base_filename),'w') as outfile:
+        df.to_string(outfile)
+print (df)
